@@ -38,9 +38,20 @@ cd gpt-image-mcp
 ./install.sh
 ```
 
-`install.sh` installs the dependencies and then **prints the exact config for
-both clients with the absolute paths already filled in for that machine**. Copy
-what it prints. (On Windows without WSL, follow *Manual setup* below.)
+On **Windows** (PowerShell), use the equivalent script:
+
+```powershell
+git clone <your-repo-url> gpt-image-mcp
+cd gpt-image-mcp
+.\install.ps1
+# if blocked by execution policy:
+#   powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+The installer (`install.sh` / `install.ps1`) installs the dependencies and then
+**prints the exact config for both clients with the absolute paths already
+filled in for that machine** (paths JSON-escaped where needed). Copy what it
+prints.
 
 > Tip: paths differ per machine, so re-run `./install.sh` on each PC rather than
 > copying a config file between them.

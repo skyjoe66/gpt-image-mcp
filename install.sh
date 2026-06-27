@@ -13,7 +13,10 @@ if command -v uv >/dev/null 2>&1; then
   echo "==> Installing dependencies with uv"
   uv sync
   CMD_BIN="$(command -v uv)"
-  CMD_ARGS=(run --directory "$REPO_DIR" gpt-image-mcp)
+  # --project (not --directory) so uv does NOT chdir into the repo. The server
+  # then inherits the client's working directory, letting images land in the
+  # project you're working in.
+  CMD_ARGS=(run --project "$REPO_DIR" gpt-image-mcp)
 else
   echo "==> uv not found; creating a virtualenv with pip instead"
   python3 -m venv .venv
@@ -34,8 +37,10 @@ if [ "${#CMD_ARGS[@]}" -gt 0 ]; then
   args_json+="]"
 fi
 
-# Build the `claude mcp add` command
-cc_cmd="claude mcp add gpt-image --scope user -e OPENAI_API_KEY=\$OPENAI_API_KEY -e IMAGE_OUTPUT_DIR=\"$OUT_DIR\" -- \"$CMD_BIN\""
+# Build the `claude mcp add` command. No IMAGE_OUTPUT_DIR here on purpose: in
+# Claude Code the server runs in your project's directory, so images default to
+# ./generated-images inside whatever project you're working in.
+cc_cmd="claude mcp add gpt-image --scope user -e OPENAI_API_KEY=\$OPENAI_API_KEY -- \"$CMD_BIN\""
 for a in "${CMD_ARGS[@]:-}"; do
   [ -n "$a" ] && cc_cmd+=" \"$a\""
 done
@@ -51,6 +56,9 @@ cat <<MSG
 $cc_cmd
 
    Verify with:  claude mcp list      (and /mcp inside a session)
+   Images save to ./generated-images inside whatever project you launch
+   Claude Code from. Override per call with the tool's output_dir argument, or
+   add  -e IMAGE_OUTPUT_DIR="/abs/path"  to the command for a fixed location.
 
 2) CLAUDE DESKTOP — add this block under "mcpServers" in your config file,
    replace sk-REPLACE_ME with your key, then fully quit & relaunch Desktop:
@@ -69,6 +77,7 @@ $cc_cmd
      Windows: %APPDATA%\\Claude\\claude_desktop_config.json
      Open it via Desktop: Settings > Developer > Edit Config
 
-Images will be saved to: $OUT_DIR
+   Desktop keeps an absolute IMAGE_OUTPUT_DIR because its working directory is
+   unpredictable. Desktop images will be saved to: $OUT_DIR
 ============================================================
 MSG

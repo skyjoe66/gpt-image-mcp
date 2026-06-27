@@ -55,14 +55,18 @@ Export your key, then run the command `install.sh` printed (it looks like this):
 export OPENAI_API_KEY=sk-...
 claude mcp add gpt-image --scope user \
   -e OPENAI_API_KEY=$OPENAI_API_KEY \
-  -e IMAGE_OUTPUT_DIR="$HOME/gpt-image-output" \
-  -- uv run --directory /abs/path/to/gpt-image-mcp gpt-image-mcp
+  -- uv run --project /abs/path/to/gpt-image-mcp gpt-image-mcp
 ```
 
 `--scope user` makes it available in every project on that machine. Verify with
-`claude mcp list`, or `/mcp` inside a session. In Claude Code, leave
-`IMAGE_OUTPUT_DIR` off if you'd rather images land in each project's
-`./generated-images` folder.
+`claude mcp list`, or `/mcp` inside a session.
+
+**`--project` (not `--directory`) is deliberate:** it stops `uv` from changing
+the working directory into the repo, so the server inherits the directory you
+launched Claude Code from. With no `IMAGE_OUTPUT_DIR` set, images then save to
+`./generated-images` inside whatever project you're working in. Want a fixed
+location instead? Add `-e IMAGE_OUTPUT_DIR="/abs/path"` to the command. You can
+also override per call with the tool's `output_dir` argument.
 
 ---
 
@@ -77,7 +81,7 @@ Desktop**.
   "mcpServers": {
     "gpt-image": {
       "command": "/absolute/path/to/uv",
-      "args": ["run", "--directory", "/abs/path/to/gpt-image-mcp", "gpt-image-mcp"],
+      "args": ["run", "--project", "/abs/path/to/gpt-image-mcp", "gpt-image-mcp"],
       "env": {
         "OPENAI_API_KEY": "sk-...",
         "IMAGE_OUTPUT_DIR": "/Users/joe/gpt-image-output"

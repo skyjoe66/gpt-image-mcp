@@ -1,0 +1,24 @@
+[project]
+name = "gpt-image-mcp"
+version = "0.1.0"
+description = "MCP server exposing OpenAI gpt-image-2 for image generation and editing in Claude Code and Claude Desktop."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Joe Caridi" }]
+keywords = ["mcp", "openai", "gpt-image", "image-generation", "claude"]
+dependencies = [
+    "mcp>=1.2.0",
+    "openai>=1.55.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+gpt-image-mcp = "gpt_image_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gpt_image_mcp"]
